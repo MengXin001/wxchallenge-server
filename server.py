@@ -53,7 +53,7 @@ def post_obs_data():
     db = DataBaseExecution()
     try:
         query = """
-            INSERT INTO obs (date, max_temp, min_temp, wind_speed, precipitation)
+            INSERT INTO obsData (date, max_temp, min_temp, wind_speed, precipitation)
             VALUES (%s, %s, %s, %s, %s)
         """
         db.cursor.execute(query, (
