@@ -1,13 +1,13 @@
 import json
 import os
 import datetime
-from database import DataBaseExecution
+from database.utils import DataBaseExecution
 
 def get_daily_obs():
-    db = DataBaseExecution()
     date = datetime.now().strftime('%Y-%m-%d')
     if not os.path.exists(date + '.json'):
         try:
+            db = DataBaseExecution()
             check_query = "SELECT COUNT(*) as count FROM obsData WHERE date = %s"
             db.cursor.execute(check_query, (date))
             result = db.cursor.fetchone()
