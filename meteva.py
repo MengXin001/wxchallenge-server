@@ -42,7 +42,7 @@ class Meteva:
             diff = min(0.5, max_standard) - min_standard
             self.errors["precip_error"] += self.precip_coef[0] * diff / 0.1
 
-        if max_standard > 0.5 and min_standard < 2,5:
+        if max_standard > 0.5 and min_standard < 2.5:
             diff = min(2.5, max_standard) - max(2.5, min_standard)
             self.errors["precip_error"] += self.precip_coef[1] * diff / 0.1
 
