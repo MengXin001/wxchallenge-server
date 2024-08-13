@@ -14,8 +14,8 @@ class Meteva:
             "precip_error": 0
         }
         
-        self.wind_coef = 1
-        self.precip_coef = [0.4, 0.3, 0.2, 0.1]
+        self.wind_coef = 0.5
+        self.precip_coef = [0.08, 0.06, 0.04, 0.02]
         for i in ["max_temp","min_temp","wind_speed","precipitation"]:
             if check_type(self.forecast[i]) == False:
                 raise ValueError(f"参数数据类型不合法: {i}")
@@ -33,16 +33,24 @@ class Meteva:
         self.errors["wind_speed_error"] = self.wind_coef * wind_speed_diff
     
     def calc_precip_error(self):
-        precip_diff = np.abs(self.forecast["precipitation"] - self.actual["precipitation"])
+        min_standard = min(self.actual["precipitation"], self.forecast["precipitation"])
+        max_standard = max(self.actual["precipitation"], self.forecast["precipitation"])
+        
+        if min_standard < 2.5:
+            diff = min(2.5, max_standard) - min_standard
+            self.errors["precip_error"] += self.precip_coef[0] * diff / 0.1
 
-        if self.actual["precipitation"] <= 0.25:
-            self.errors["precip_error"] = self.precip_coef[0] * precip_diff / 0.25
-        elif 2.5 < self.actual["precipitation"] <= 6.5:
-            self.errors["precip_error"] = self.precip_coef[1] * precip_diff
-        elif 6.5 < self.actual["precipitation"] <= 12.5:
-            self.errors["precip_error"] = self.precip_coef[2] * precip_diff
-        else:
-            self.errors["precip_error"] = self.precip_coef[3] * precip_diff
+        if max_standard > 2.5 and min_standard < 6.5:
+            diff = min(6.5, max_standard) - max(2.5, min_standard)
+            self.errors["precip_error"] += self.precip_coef[1] * diff / 0.1
+
+        if max_standard > 6.5 and min_standard < 12.5:
+            diff = min(12.5, max_standard) - max(6.5, min_standard)
+            self.errors["precip_error"] += self.precip_coef[2] * diff / 0.1
+
+        if max_standard > 12.5:
+            diff = max_standard - max(12.5, min_standard)
+            self.errors["precip_error"] += self.precip_coef[3] * diff / 0.1
 
     def calc_total_error(self):
         self.calc_temperature_error()
