@@ -61,7 +61,7 @@ class Meteva:
         if max_standard > 100:
             diff = max_standard - max(100, min_standard)
             self.errors["precip_error"] += self.precip_coef[5] * diff / 0.1
-            
+
         self.errors["precip_error"] = round(self.errors["precip_error"], 1)
 
     def calc_total_error(self):
@@ -91,5 +91,5 @@ if __name__ == '__main__':
         "precipitation": 11
     }
     
-meteva_instance = Meteva(f, a)
-print(meteva_instance.res())
+    meteva_instance = Meteva(f, a)
+    print(meteva_instance.res())
