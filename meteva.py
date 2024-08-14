@@ -26,13 +26,13 @@ class Meteva:
         max_temp_diff = np.abs(self.forecast["max_temp"] - self.actual["max_temp"])
         min_temp_diff = np.abs(self.forecast["min_temp"] - self.actual["min_temp"])
         
-        self.errors["max_temperature_error"] = max_temp_diff
-        self.errors["min_temperature_error"] = min_temp_diff
+        self.errors["max_temperature_error"] = round(max_temp_diff, 1)
+        self.errors["min_temperature_error"] = round(min_temp_diff, 1)
 
     def calc_wind_speed_error(self):
         wind_speed_diff = np.abs(self.forecast["wind_speed"] - self.actual["wind_speed"])
 
-        self.errors["wind_speed_error"] = self.wind_coef * wind_speed_diff
+        self.errors["wind_speed_error"] = round(self.wind_coef * wind_speed_diff, 1)
     
     def calc_precip_error(self):
         min_standard = min(self.actual["precipitation"], self.forecast["precipitation"])
@@ -61,7 +61,9 @@ class Meteva:
         if max_standard > 100:
             diff = max_standard - max(100, min_standard)
             self.errors["precip_error"] += self.precip_coef[5] * diff / 0.1
- 
+            
+        self.errors["precip_error"] = round(self.errors["precip_error"], 1)
+
     def calc_total_error(self):
         self.calc_temperature_error()
         self.calc_wind_speed_error()
