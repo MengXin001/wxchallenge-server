@@ -1,0 +1,64 @@
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&display=swap" rel="stylesheet">
+    <link href='https://s1.moexin.cn/wxchallenge/css/reset.css' rel='stylesheet' type='text/css' />
+    <script src="https://s1.moexin.cn/wxchallenge/js/tailwindcssv3.4.5.js"></script>
+    <script src="https://s1.moexin.cn/wxchallenge/js/Rank.js"></script>
+    <script type="module">
+        let twc = {
+            important: true,
+        }
+        tailwind.config = twc
+    </script>
+</head>
+
+<body>
+    <div class="px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="sm:flex sm:items-center">
+            <div class="sm:flex-auto">
+                <h1 id="date" class="text-xl font-semibold text-gray-900"></h1>
+                <p id="obs" class="mt-2 text-sm text-gray-700"></p>
+            </div>
+            <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+                <button type="button"
+                    class="inline-flex items-center justify-center rounded-md border border-transparent bg-[#195bf5] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 sm:w-auto">ChangeDate(No
+                    Func)</button>
+            </div>
+        </div>
+        <div class="mt-8 flex flex-col">
+            <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                    <div class="overflow-hidden md:rounded-lg">
+                        <table class="border-collapse min-w-full divide-y divide-gray-300">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col"
+                                        class="py-3.5 pl-4 pr-3 text-left text-md font-semibold text-gray-900 sm:pl-6">
+                                        排名</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-md font-semibold text-gray-900">
+                                        用户名
+                                    </th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-md font-semibold text-gray-900">
+                                        用户预报</th>
+                                    <th scope="col" class="px-3 py-3.5 text-right text-md font-semibold text-gray-900">
+                                        累计误差分</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ranking-list" class="divide-y divide-gray-200 bg-white">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<style>
+    * {
+        font-family: Inter, PingFang SC-Semibold, PingFang SC, Noto Sans SC, -apple-system, system-ui;
+    }
+</style>
