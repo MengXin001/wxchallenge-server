@@ -37,6 +37,7 @@ def get_user_info():
 @app.route('/api/getRank', methods=['GET'])
 def get_user_rank():
     date = request.args.get('date')
+    usertype = request.args.get('usertype')
     db = DataBaseExecution()
     try:
         check_query = "SELECT COUNT(*) as count FROM wp_WxChallengeCont WHERE forecast_date = %s"
@@ -44,7 +45,12 @@ def get_user_rank():
         result = db.cursor.fetchone()
         
         if result['count'] > 0:
-            select_query = "SELECT * FROM wp_WxChallengeCont WHERE forecast_date = %s"
+            if usertype=="beginner":
+                select_query = "SELECT * FROM wp_WxChallengeCont WHERE forecast_date = %s AND is_beginner = 1"
+            elif usertype=="u_beginner":
+                select_query = "SELECT * FROM wp_WxChallengeCont WHERE forecast_date = %s AND is_beginner = 0"
+            else:
+                select_query = "SELECT * FROM wp_WxChallengeCont WHERE forecast_date = %s"
             db.cursor.execute(select_query, (date))
             res = db.cursor.fetchall()
             
