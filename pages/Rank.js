@@ -49,13 +49,14 @@ document.addEventListener('DOMContentLoaded', async function () {
                     if (selectedGroup === "All" || ug === groupSelect.value) {
                         const row = document.createElement('tr')
                         const rankIcon = index < 3 ? '✨' : ''
+                        const pic = item.is_beginner === 1 ? "" : ""
                         row.innerHTML = `
 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-[16px] font-medium text-gray-900 sm:pl-6">${rankIcon} ${index + 1}</td>
 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-[16px] sm:pl-6">
     <div class="flex items-center">
         <div class="h-10 w-10 flex-shrink-0">
             <img class="h-10 w-10 rounded-full" 
-            src="" alt="" />
+            src=${pic} alt="" />
         </div>
         <div class="ml-4">
             <div class="text-[16px] font-medium text-gray-900">${item.user_nickname}</div>
