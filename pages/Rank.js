@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const dateSelect = document.getElementById('date-select')
     for (let i = 0; i <= 5; i++) {
         const date = new Date()
-        date.setDate(today.getDate() - i)
+        date.setDate(today.getDate() - 1 - i)
         const formattedDate = date.toISOString().split('T')[0]
         const option = document.createElement('option')
         option.value = formattedDate
@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     async function getData(date, grouplist = false) {
-        const rankapi = `https://api.moexin.cn/api/getRank?date=${date}`
-        const obsapi = `https://api.moexin.cn/api/getObsData?date=${date}`
-        const userapi = "https://api.moexin.cn/api/getUserInfo"
+        const rankapi = `https://wxapi.moexin.cn/api/getRank?date=${date}`
+        const obsapi = `https://wxapi.moexin.cn/api/getObsData?date=${date}`
+        const userapi = "https://wxapi.moexin.cn/api/getUserInfo"
         const userInfoResponse = await fetch(userapi)
         const userInfoData = await userInfoResponse.json()
         let usergroup = userInfoData.data
@@ -48,7 +48,19 @@ document.addEventListener('DOMContentLoaded', async function () {
                     const ug = usergroup.find(res => res.user_nickname === item.user_nickname).user_school
                     if (selectedGroup === "All" || ug === groupSelect.value) {
                         const row = document.createElement('tr')
-                        const rankIcon = index < 3 ? '✨' : ''
+                        let rankIcon
+                        if (index < 3) {
+                            rankIcon = '✨'
+                        }
+                        else if (index === 3 || index === 4) {
+                            rankIcon = '🌹'
+                        }
+                        else if (usergroup.find(res => res.user_nickname === item.user_nickname).user_school === '机构及电脑预报') {
+                            rankIcon = '💻'
+                        }
+                        else {
+                            rankIcon = ''
+                        }
                         const pic = item.is_beginner === 1 ? "" : ""
                         row.innerHTML = `
 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-[16px] font-medium text-gray-900 sm:pl-6">${rankIcon} ${index + 1}</td>

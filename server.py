@@ -111,15 +111,12 @@ def get_obs_data():
 @app.route('/api/meteva', methods=['POST'])
 def wxchallenge():
     data_format = {
-        "user_name": "string",
         "max_temp": "float",
         "min_temp": "float", 
         "wind_speed": "float",
-        "precipitation": "float"
+        "precipitation": "float",
+        "forecast_date": "string"
     }
-    now = datetime.now()
-    if now.hour >= 20:
-        return jsonify({"msg": "200", "data": "当日提交已经截止"}), 200
 
     data = request.get_json()
     mock_ac = {
@@ -128,11 +125,30 @@ def wxchallenge():
         "wind_speed": 8.0,
         "precipitation": 16
     }
+    db = DataBaseExecution()
     try:
         for key in data_format.keys():
             if key not in data:
                 return jsonify({"msg": "400", "error": f"缺失参数: '{key}'"}), 400
-        meteva_instance = Meteva(data, mock_ac)
+                
+        check_query = "SELECT COUNT(*) as count FROM wp_WxChallengeObs WHERE obs_date = %s"
+        db.cursor.execute(check_query, (data["forecast_date"]))
+        result = db.cursor.fetchone()
+        if result['count'] > 0:
+            select_query = "SELECT * FROM wp_WxChallengeObs WHERE obs_date = %s"
+            db.cursor.execute(select_query, data["forecast_date"])
+            res = db.cursor.fetchall()
+            obsdata = {
+                "max_temp": res[0]["max_temp_obs"],
+                "min_temp": res[0]["min_temp_obs"],
+                "wind_speed": res[0]["max_wind_speed_obs"],
+                "precipitation": res[0]["precipitation_obs"]
+            }
+        else:
+            obsdata = "数据不存在"
+        db.close()
+        
+        meteva_instance = Meteva(data, obsdata)
         res = meteva_instance.res()
         
         return jsonify({"msg": "200", "data": res}), 200
