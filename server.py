@@ -108,35 +108,23 @@ def get_obs_data():
     finally:
         db.close()
 
-@app.route('/api/meteva', methods=['POST'])
+@app.route('/api/meteva', methods=['GET'])
 def wxchallenge():
-    data_format = {
-        "max_temp": "float",
-        "min_temp": "float", 
-        "wind_speed": "float",
-        "precipitation": "float",
-        "forecast_date": "string"
-    }
-
-    data = request.get_json()
-    mock_ac = {
-        "max_temp": 32.0,
-        "min_temp": 28.0,
-        "wind_speed": 8.0,
-        "precipitation": 16
-    }
+    date = request.args.get('date')
     db = DataBaseExecution()
-    try:
-        for key in data_format.keys():
-            if key not in data:
-                return jsonify({"msg": "400", "error": f"缺失参数: '{key}'"}), 400
-                
-        check_query = "SELECT COUNT(*) as count FROM wp_WxChallengeObs WHERE obs_date = %s"
-        db.cursor.execute(check_query, (data["forecast_date"]))
+    try:        
+        select_query = "SELECT * FROM wp_WxChallengeSU_test"
+        db.cursor.execute(select_query)
+        res = db.cursor.fetchall()
+        accu_ep_latest_list = {}
+        for item in res:
+            accu_ep_latest_list[item["user_nickname"]] = item["accu_ep_latest"]
+        check_query = "SELECT COUNT(*) as  count FROM wp_WxChallengeObs WHERE obs_date = %s"
+        db.cursor.execute(check_query, (date))
         result = db.cursor.fetchone()
         if result['count'] > 0:
             select_query = "SELECT * FROM wp_WxChallengeObs WHERE obs_date = %s"
-            db.cursor.execute(select_query, data["forecast_date"])
+            db.cursor.execute(select_query, date)
             res = db.cursor.fetchall()
             obsdata = {
                 "max_temp": res[0]["max_temp_obs"],
@@ -146,15 +134,38 @@ def wxchallenge():
             }
         else:
             obsdata = "数据不存在"
+        select_query = "SELECT * FROM wp_WxChallengeCont_test WHERE forecast_date = %s"
+        db.cursor.execute(select_query, (date))
+        res = db.cursor.fetchall()
+        
+        for user in res:
+            data = {
+                "max_temp": user["max_temp"],
+                "min_temp": user["min_temp"],
+                "wind_speed": user["max_wind_speed"],
+                "precipitation": user["precipitation"]
+            }
+            meteva_instance = Meteva(data, obsdata)
+            res = meteva_instance.res()
+            score = res["total_error"]
+            t_score = accu_ep_latest_list[user["user_nickname"]]
+            t_score = float(0 if t_score is None else t_score)
+            t_score += res["total_error"]
+            update_sql = "UPDATE wp_WxChallengeCont_test SET score = %s, t_score = %s WHERE user_nickname = %s AND forecast_date = %s"
+            params = (score, t_score, user["user_nickname"], date)
+            db.cursor.execute(update_sql, params)
+            db.submit()
+            update_sql = "UPDATE wp_WxChallengeSU_test SET accu_ep_latest = %s WHERE user_nickname = %s"
+            params = (t_score, user["user_nickname"])
+            db.cursor.execute(update_sql, params)
+            db.submit()
         db.close()
         
-        meteva_instance = Meteva(data, obsdata)
-        res = meteva_instance.res()
-        
-        return jsonify({"msg": "200", "data": res}), 200
+        return jsonify({"msg": "200"}), 200
     except Exception as e:
         logger.error(f"error: {e}")
-        return jsonify({"msg": "400", "error": e}), 400
+        return jsonify({"msg": "400"}), 400
+
 
 if __name__ == '__main__':
     app.run(port=11451, threaded=True)
